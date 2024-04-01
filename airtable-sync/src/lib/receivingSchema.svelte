@@ -1,7 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { receivingBase } from '$lib/stores'; // Assuming you have a store for the selected base
-    import { fetchBaseSchema } from './fetchSchema';
+    import { fetchBaseSchema } from '$lib/fetchSchema';
+    import BaseSelector from '$lib/baseSelector.svelte';
 
     let tables = [];
     let toggledTableId = null; // State to track which table's fields are visible
@@ -19,6 +20,7 @@
 </script>
 
 <div>
+    <BaseSelector />
     <h1>Receiving Schema</h1>
     <ul>
         {#each tables as table}
