@@ -1,25 +1,20 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { writable } from 'svelte/store';
-    import { fetchBases } from '../lib/fetchBases';
-
-    // Assuming receivingBase is defined in a separate file, similar to this
-    export const receivingBase = writable(null);
+    import { fetchBases } from '$lib/fetchBases';
+    import { receivingBase } from '$lib/receivingBaseStore'; // Adjust the import path as necessary
 
     let bases = [];
-    let selectedBaseId = ''; // Local variable to bind with the dropdown
+    let selectedBaseId: string | undefined; // Initialize with undefined or a specific base ID
+
+    $: receivingBase.set(selectedBaseId);
 
     onMount(async () => {
-        const fetchedBases = await fetchBases();
-        bases = fetchedBases;
-        if (bases.length > 0) {
-            selectedBaseId = bases[0].id; // Optionally initialize with the first base ID
-            receivingBase.set(selectedBaseId); // Update the receivingBase store
+        bases = await fetchBases();
+        // Optionally initialize selectedBaseId with the first base's ID
+        if (bases.length > 0 && !selectedBaseId) {
+            selectedBaseId = bases[0].id;
         }
     });
-
-    // Update the receivingBase store whenever the selection changes
-    $: receivingBase.set(selectedBaseId);
 </script>
 
 <select bind:value={selectedBaseId}>

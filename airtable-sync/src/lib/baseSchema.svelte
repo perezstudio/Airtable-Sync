@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { selectedBase, receivingBase } from '$lib/stores'; // Assuming you have a store for the selected base
+    import { selectedBase } from '$lib/selectedBaseStore'; // Assuming you have a store for the selected base
     import { fetchBaseSchema } from './fetchSchema';
 
     let tables = [];

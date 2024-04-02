@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { fetchBases } from './fetchBases';
-    import { selectedBase } from '$lib/stores';
+    import { selectedBase } from '$lib/selectedBaseStore';
 
     let bases = [];
 
