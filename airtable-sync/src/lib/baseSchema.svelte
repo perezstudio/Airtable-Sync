@@ -1,7 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { selectedBase } from '$lib/selectedBaseStore'; // Assuming you have a store for the selected base
+    import { selectedBase } from '$lib/selectedBaseStore';
     import { fetchBaseSchema } from './fetchSchema';
+	import { baseSchema } from '$lib/schemaStore';
 
     let tables = [];
     let toggledTableId = null; // State to track which table's fields are visible
@@ -10,12 +11,14 @@
     $: if ($selectedBase) {
         fetchBaseSchema($selectedBase).then(fetchedTables => {
             tables = fetchedTables;
+            baseSchema.set(tables);
         });
     }
 
     function toggleTable(tableId: string) {
         toggledTableId = toggledTableId === tableId ? null : tableId;
     }
+
 </script>
 
 <div>
