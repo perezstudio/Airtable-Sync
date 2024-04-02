@@ -19,7 +19,7 @@
 </script>
 
 <div>
-    <h1>Base Schema</h1>
+    <h1>Primary Base</h1>
     <ul>
         {#each tables as table}
             <li>
@@ -27,7 +27,9 @@
                 {#if toggledTableId === table.id}
                     <ul>
                         {#each table.fields as field}
-                            <li>{field.name} ({field.type})</li>
+                            <li>
+                                <p>{field.name}</p><p>{field.type}</p>
+                            </li>
                         {/each}
                     </ul>
                 {/if}

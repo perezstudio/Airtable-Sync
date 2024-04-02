@@ -4,8 +4,10 @@
     import ReceivingSchema from '$lib/receivingSchema.svelte';
 </script>
 
-<div class="flex flex-row">
+<div class="flex flex-row bg-slate-300 p-4">
     <Sidebar />
-    <BaseSchema />
-    <ReceivingSchema />
+    <div class="flex flex-row bg-white w-full p-4 rounded-lg">
+        <BaseSchema />
+        <ReceivingSchema />
+    </div>
 </div>

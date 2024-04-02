@@ -17,11 +17,16 @@
 
 <div>
     <p>Selected Base ID: {$selectedBase}</p>
-    <h1>Bases</h1>
+    <h1 class="px-4">Bases</h1>
     {#if bases.length > 0}
         <ul>
             {#each bases as base}
-                <li on:click={() => selectBase(base.id)}>{base.name}</li>
+                <li on:click={() => selectBase(base.id)} class="py-2 px-4 flex flex-row">
+                    <p>{base.name}</p>
+                    {#if base.id == $selectedBase}
+                        <p>Selected</p>
+                    {/if}
+                </li>
             {/each}
         </ul>
     {:else}

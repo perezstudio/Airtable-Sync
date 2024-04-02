@@ -19,8 +19,8 @@
 </script>
 
 <div>
+    <h1>Receiving Base</h1>
     <BaseSelector bind:selectedBaseId={$receivingBase} />
-    <h1>Receiving Schema</h1>
     <ul>
         {#each tables as table}
             <li>
