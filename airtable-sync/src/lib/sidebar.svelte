@@ -21,7 +21,7 @@
     {#if bases.length > 0}
         <ul>
             {#each bases as base}
-                <li on:click={() => selectBase(base.id)} class="py-2 px-4 flex flex-row">
+                <li on:click={() => selectBase(base.id)} class="w-full py-2 px-4 flex flex-row">
                     <p>{base.name}</p>
                     {#if base.id == $selectedBase}
                         <p>Selected</p>

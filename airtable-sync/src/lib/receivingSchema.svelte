@@ -20,7 +20,7 @@
     }
 </script>
 
-<div>
+<div class="w-full">
     <h1>Receiving Base</h1>
     <BaseSelector bind:selectedBaseId={$receivingBase} />
     <ul>

@@ -21,7 +21,7 @@
 
 </script>
 
-<div>
+<div class="w-full">
     <h1>Primary Base</h1>
     <ul>
         {#each tables as table}
