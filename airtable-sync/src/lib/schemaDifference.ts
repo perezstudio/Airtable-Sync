@@ -1,102 +1,138 @@
-export async function compareSchemas(baseSchema, receivingSchema) {
-    let actions = {
-        createTables: [],
-        updateTables: [],
-        deleteTables: []
+// Assume `fetchSchema` is a function that fetches the schema for a given baseId
+// and `selectedBaseSchema` and `receivingBaseSchema` are the schemas for the two bases.
+
+// Function to compare base schemas
+function compareBaseSchemas(selectedBaseSchema: any, receivingBaseSchema: any) {
+    const differences = {
+        Create: [],
+        Update: [],
+        Delete: [],
+        CreateLinked: [],
+        CreateFormula: [],
+        UpdateLinked: [],
+        UpdateFormula: []
     };
+    
+    console.log(selectedBaseSchema);
+    console.log(receivingBaseSchema);
 
-    // Create maps for quick lookup by ID
-    let baseTablesMap = new Map(baseSchema.map(table => [table.id, table]));
-    let receivingTablesMap = new Map(receivingSchema.map(table => [table.id, table]));
+    // Check tables to create or update
+    selectedBaseSchema.forEach(table => {
+        const foundTable = receivingBaseSchema.find(t => t.name === table.name);
+        if (!foundTable) {
+            // Table not found, add to create
+            differences.Create.push({
+                type: 'table',
+                json: table // Assuming `table` contains all necessary data
+            });
+        } else {
+            // Table found, check for updates
+            if (!areTableDetailsEqual(table, foundTable)) {
+                differences.Update.push({
+                    id: foundTable.id,
+                    type: 'table',
+                    json: table // Include the necessary update details
+                });
+            }
+            // Check fields within the found table
+            compareTableFields(table, foundTable, differences);
+        }
+    });
 
-    // Determine tables to be created, updated, or deleted
-    baseSchema.tables.forEach(baseTable => {
-        if (!receivingTablesMap.has(baseTable.id)) {
-            // For tables to be created, include all its fields in the options
-            actions.createTables.push({
-                id: baseTable.id,
-                name: baseTable.name,
-                type: "table", // Assuming a type to distinguish between tables and fields
-                options: {
-                    fields: baseTable.fields.map(field => ({
+    // Check tables and fields to delete
+    receivingBaseSchema.forEach(table => {
+        if (!selectedBaseSchema.some(t => t.name === table.name)) {
+            // Table in receivingBase not found in selectedBase, add to delete
+            differences.Delete.push({
+                id: table.id,
+                type: 'table'
+            });
+        } else {
+            const correspondingTable = selectedBaseSchema.find(t => t.name === table.name);
+            table.fields.forEach(field => {
+                if (!correspondingTable.fields.some(f => f.name === field.name)) {
+                    // Field in receivingBase not found in selectedBase, add to delete
+                    differences.Delete.push({
                         id: field.id,
-                        name: field.name,
-                        type: field.type,
-                        options: field.options || {}
-                    }))
+                        type: 'field'
+                    });
                 }
             });
-        } else {
-            let receivingTable = receivingTablesMap.get(baseTable.id);
-            let tableUpdates = compareTableFields(baseTable, receivingTable);
-            if (tableUpdates.create.length > 0 || tableUpdates.update.length > 0 || tableUpdates.delete.length > 0) {
-                actions.updateTables.push({
-                    id: baseTable.id,
-                    name: baseTable.name,
-                    type: "table",
-                    options: tableUpdates
-                });
-            }
         }
     });
 
-    // Determine tables to delete
-    receivingSchema.tables.forEach(receivingTable => {
-        if (!baseTablesMap.has(receivingTable.id)) {
-            actions.deleteTables.push({
-                id: receivingTable.id,
-                name: receivingTable.name,
-                type: "table",
-                options: {} // No additional options needed for deletion
-            });
-        }
-    });
-
-    return actions;
+    return differences;
 }
 
-function compareTableFields(baseTable, receivingTable) {
-    let fieldActions = {
-        create: [],
-        update: [],
-        delete: []
-    };
-
-    let baseFieldsMap = new Map(baseTable.fields.map(field => [field.id, field]));
-    let receivingFieldsMap = new Map(receivingTable.fields.map(field => [field.id, field]));
-
-    baseTable.fields.forEach(baseField => {
-        if (!receivingFieldsMap.has(baseField.id)) {
-            fieldActions.create.push({
-                id: baseField.id,
-                name: baseField.name,
-                type: baseField.type,
-                options: baseField.options || {}
-            });
-        } else {
-            // Example for an update check. Implement actual comparison logic as needed.
-            let receivingField = receivingFieldsMap.get(baseField.id);
-            if (baseField.type !== receivingField.type) { // Simplified check, expand as necessary
-                fieldActions.update.push({
-                    id: baseField.id,
-                    name: baseField.name,
-                    type: baseField.type,
-                    options: baseField.options || {}
+// Function to compare fields within two tables
+function compareTableFields(selectedTable, receivingTable, differences) {
+    selectedTable.fields.forEach(field => {
+        const foundField = receivingTable.fields.find(f => f.name === field.name);
+        if (!foundField) {
+            // Field not found, add to create
+            if (field.type === 'formula') {
+                differences.CreateFormula.push({
+                    type: 'field',
+                    tableId: receivingTable.id,
+                    json: field
                 });
+            } else if (field.type === 'link') {
+                differences.CreateLinked.push({
+                    type: 'field',
+                    tableId: receivingTable.id,
+                    json: field
+                });
+            } else {
+                differences.Create.push({
+                    type: 'field',
+                    tableId: receivingTable.id,
+                    json: field
+                });
+            }
+        } else {
+            // Field found, check for updates
+            if (!areFieldDetailsEqual(field, foundField)) {
+                if (field.type === 'formula') {
+                    differences.UpdateFormula.push({
+                        id: foundField.id,
+                        type: 'field',
+                        tableId: receivingTable.id,
+                        json: field
+                    });
+                } else if (field.type === 'link') {
+                    differences.UpdateLinked.push({
+                        id: foundField.id,
+                        type: 'field',
+                        tableId: receivingTable.id,
+                        json: field
+                    });
+                } else {
+                    differences.Update.push({
+                        id: foundField.id,
+                        type: 'field',
+                        tableId: receivingTable.id,
+                        json: field
+                    });
+                }
             }
         }
     });
+}
 
-    receivingTable.fields.forEach(receivingField => {
-        if (!baseFieldsMap.has(receivingField.id)) {
-            fieldActions.delete.push({
-                id: receivingField.id,
-                name: receivingField.name,
-                type: receivingField.type,
-                options: receivingField.options || {}
-            });
-        }
-    });
+// Utility functions to check equality of table or field details
+// These functions should compare the necessary attributes to determine equality
+function areTableDetailsEqual(table1, table2) {
+    // Compare table details (e.g., description)
+    return table1.description === table2.description;
+}
 
-    return fieldActions;
+function areFieldDetailsEqual(field1, field2) {
+    // Compare field details (e.g., type, options)
+    return field1.type === field2.type && JSON.stringify(field1.options) === JSON.stringify(field2.options);
+}
+
+// Example "master" function to orchestrate the comparison
+export async function executeComparison(selectedBaseSchema: any, receivingBaseSchema: any) {
+    const differences = compareBaseSchemas(selectedBaseSchema, receivingBaseSchema); // Adjust this line as per your actual comparison logic implementation
+    return differences;
 }

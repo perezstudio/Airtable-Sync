@@ -30,7 +30,7 @@
                 {#if toggledTableId === table.id}
                     <ul>
                         {#each table.fields as field}
-                            <li>
+                            <li class="flex flex-row justify-between">
                                 <p>{field.name}</p><p>{field.type}</p>
                             </li>
                         {/each}

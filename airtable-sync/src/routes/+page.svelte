@@ -7,7 +7,7 @@
 
 <div class="flex flex-row bg-slate-300 p-4">
     <Sidebar />
-    <div class="flex flex-row bg-white w-full p-4 rounded-lg">
+    <div class="flex flex-row bg-white w-full p-4 rounded-lg gap-4">
         <BaseSchema />
         <ChangesSchema />
         <ReceivingSchema />

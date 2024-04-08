@@ -1,60 +1,18 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
-    import { baseSchema, receivingSchema } from '$lib/schemaStore';
-    import { compareSchemas } from '$lib/schemaDifference';
+    import { baseSchema, receivingSchema, differencesSchema } from '$lib/schemaStore';
+    import { executeComparison } from '$lib/schemaDifference';
 
-    let actions = writable({ createTables: [], updateTables: [], deleteTables: [] });
-
-    async function updateActions() {
-        if ($baseSchema && $receivingSchema) {
-            const result = await compareSchemas($baseSchema, $receivingSchema);
-            actions.set(result);
-        }
+    async function handleCompareClick() {
+      // Directly use the $ syntax to access the store values
+      const differences = await executeComparison($baseSchema, $receivingSchema);
+      differencesSchema.set(differences); // Store the results in the differencesSchema store
     }
-
-    // Reactive trigger for schema changes
-    $: $baseSchema, $receivingSchema, updateActions();
 </script>
 
 
 <div class="w-full">
+    <button on:click={handleCompareClick}>Compare Schemas</button>
     <h2>Create</h2>
-    {#each $actions.createTables as { id, name, type, options }}
-      <div>
-        <h3>{name} (Table)</h3>
-        {#if options.fields && options.fields.length}
-          <ul>
-            {#each options.fields as field}
-              <li>{field.name} ({field.type})</li>
-            {/each}
-          </ul>
-        {/if}
-      </div>
-    {/each}
-    <h2>Update</h2>
-    {#each $actions.updateTables as { id, name, type, options }}
-      <div>
-        <h3>{name} (Table)</h3>
-        {#if options.fields && options.fields.length}
-          <ul>
-            {#each options.fields as field}
-              <li>{field.name} ({field.type})</li>
-            {/each}
-          </ul>
-        {/if}
-      </div>
-    {/each}
-    <h2>Delete</h2>
-    {#each $actions.deleteTables as { id, name, type, options }}
-      <div>
-        <h3>{name} (Table)</h3>
-        {#if options.fields && options.fields.length}
-          <ul>
-            {#each options.fields as field}
-              <li>{field.name} ({field.type})</li>
-            {/each}
-          </ul>
-        {/if}
-      </div>
-    {/each}
+    <p>{differencesSchema}</p>
 </div>
