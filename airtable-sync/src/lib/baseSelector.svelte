@@ -17,7 +17,7 @@
     });
 </script>
 
-<select bind:value={selectedBaseId}>
+<select bind:value={selectedBaseId} class="w-full">
     {#each bases as base}
         <option value={base.id}>{base.name}</option>
     {/each}

@@ -1,6 +1,3 @@
-// Assume `fetchSchema` is a function that fetches the schema for a given baseId
-// and `selectedBaseSchema` and `receivingBaseSchema` are the schemas for the two bases.
-
 // Function to compare base schemas
 function compareBaseSchemas(selectedBaseSchema: any, receivingBaseSchema: any) {
     const differences = {
@@ -19,9 +16,11 @@ function compareBaseSchemas(selectedBaseSchema: any, receivingBaseSchema: any) {
     // Check tables to create or update
     selectedBaseSchema.forEach(table => {
         const foundTable = receivingBaseSchema.find(t => t.name === table.name);
+        console.log(foundTable);
         if (!foundTable) {
             // Table not found, add to create
             differences.Create.push({
+                name: 'table name',
                 type: 'table',
                 json: table // Assuming `table` contains all necessary data
             });
@@ -29,6 +28,7 @@ function compareBaseSchemas(selectedBaseSchema: any, receivingBaseSchema: any) {
             // Table found, check for updates
             if (!areTableDetailsEqual(table, foundTable)) {
                 differences.Update.push({
+                    name: foundTable.name,
                     id: foundTable.id,
                     type: 'table',
                     json: table // Include the necessary update details
@@ -44,6 +44,7 @@ function compareBaseSchemas(selectedBaseSchema: any, receivingBaseSchema: any) {
         if (!selectedBaseSchema.some(t => t.name === table.name)) {
             // Table in receivingBase not found in selectedBase, add to delete
             differences.Delete.push({
+                name: table.name,
                 id: table.id,
                 type: 'table'
             });
@@ -53,8 +54,9 @@ function compareBaseSchemas(selectedBaseSchema: any, receivingBaseSchema: any) {
                 if (!correspondingTable.fields.some(f => f.name === field.name)) {
                     // Field in receivingBase not found in selectedBase, add to delete
                     differences.Delete.push({
+                        name: field.name,
                         id: field.id,
-                        type: 'field'
+                        type: field.type
                     });
                 }
             });
@@ -72,19 +74,22 @@ function compareTableFields(selectedTable, receivingTable, differences) {
             // Field not found, add to create
             if (field.type === 'formula') {
                 differences.CreateFormula.push({
-                    type: 'field',
+                    name: field.name,
+                    type: field.type,
                     tableId: receivingTable.id,
                     json: field
                 });
             } else if (field.type === 'link') {
                 differences.CreateLinked.push({
-                    type: 'field',
+                    name: field.name,
+                    type: field.type,
                     tableId: receivingTable.id,
                     json: field
                 });
             } else {
                 differences.Create.push({
-                    type: 'field',
+                    name: field.name,
+                    type: field.type,
                     tableId: receivingTable.id,
                     json: field
                 });
@@ -94,22 +99,25 @@ function compareTableFields(selectedTable, receivingTable, differences) {
             if (!areFieldDetailsEqual(field, foundField)) {
                 if (field.type === 'formula') {
                     differences.UpdateFormula.push({
+                        name: foundField.name,
                         id: foundField.id,
-                        type: 'field',
+                        type: field.type,
                         tableId: receivingTable.id,
                         json: field
                     });
                 } else if (field.type === 'link') {
                     differences.UpdateLinked.push({
+                        name: foundField.name,
                         id: foundField.id,
-                        type: 'field',
+                        type: field.type,
                         tableId: receivingTable.id,
                         json: field
                     });
                 } else {
                     differences.Update.push({
+                        name: foundField.name,
                         id: foundField.id,
-                        type: 'field',
+                        type: field.type,
                         tableId: receivingTable.id,
                         json: field
                     });
@@ -134,5 +142,6 @@ function areFieldDetailsEqual(field1, field2) {
 // Example "master" function to orchestrate the comparison
 export async function executeComparison(selectedBaseSchema: any, receivingBaseSchema: any) {
     const differences = compareBaseSchemas(selectedBaseSchema, receivingBaseSchema); // Adjust this line as per your actual comparison logic implementation
+    console.log(differences);
     return differences;
 }
