@@ -1,5 +1,5 @@
 export async function fetchBaseSchema(baseId: string): Promise<any> {
-    const apiKey = "pat4IQUYC7k2jo9e0.21c431ea54c16a2c8bf46c768ce769a55a5496db63833f5dbc72d6a172315c41";
+    const apiKey = "pat4IQUYC7k2jo9e0.bdfb15d3b65f74247b977fda41c03f4437fc1c62b1ee66ad6b08f81befef3293";
 
     if (!apiKey) {
         console.error('Airtable API key is not set in environment variables.');

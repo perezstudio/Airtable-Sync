@@ -5,16 +5,18 @@
     import ChangesSchema from '$lib/changesSchema.svelte';
 </script>
 
-<div class="flex flex-row bg-slate-300 p-4">
-    <Sidebar />
-    <div class="flex flex-row bg-white w-full p-4 rounded-lg gap-4">
-        <div class="w-1/3">
+<div class="grid grid-cols-7 bg-gray-200 gap-2 p-4 h-screen min-h-screen overflow-hidden">
+    <aside class="self-start sticky top-0 col-span-1 h-screen overflow-scroll py-4">
+        <Sidebar />
+    </aside>
+    <div class="col-span-6 grid grid-cols-3 bg-white p-4 rounded-lg gap-4 h-screen overflow-y-scroll">
+        <div class="col-span-1 overflow-scroll">
             <BaseSchema />
         </div>
-        <div class="w-1/3">
+        <div class="col-span-1 overflow-scroll">
             <ChangesSchema />
         </div>
-        <div class="w-1/3">
+        <div class="col-span-1 hover:overflow-scroll">
             <ReceivingSchema />
         </div>
     </div>

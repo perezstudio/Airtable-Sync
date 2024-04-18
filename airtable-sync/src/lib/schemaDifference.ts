@@ -1,3 +1,5 @@
+import { json } from "@sveltejs/kit";
+
 // Function to compare base schemas
 function compareBaseSchemas(selectedBaseSchema: any, receivingBaseSchema: any) {
     const differences = {
@@ -20,7 +22,7 @@ function compareBaseSchemas(selectedBaseSchema: any, receivingBaseSchema: any) {
         if (!foundTable) {
             // Table not found, add to create
             differences.Create.push({
-                name: 'table name',
+                name: table.name,
                 type: 'table',
                 json: table // Assuming `table` contains all necessary data
             });

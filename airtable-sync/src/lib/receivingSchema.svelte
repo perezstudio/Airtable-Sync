@@ -20,13 +20,15 @@
     }
 </script>
 
-<div class="w-full">
-    <h1>Receiving Base</h1>
-    <BaseSelector bind:selectedBaseId={$receivingBase} />
+<div class="w-full flex flex-col gap-4">
+    <div class="flex flex-col gap-1">
+        <h1 class="uppercase text-sm font-bold text-slate-400 w-full">Receiving Base</h1>
+        <BaseSelector bind:selectedBaseId={$receivingBase} />
+    </div>
     <ul>
         {#each tables as table}
             <li>
-                <button on:click={() => toggleTable(table.id)}>{table.name}</button>
+                <button class="flex flex-row justify-left rounded-md text-lg w-full font-bold text-slate-600 py-1 px-1.5 hover:bg-slate-200" on:click={() => toggleTable(table.id)}>{table.name}</button>
                 {#if toggledTableId === table.id}
                     <ul>
                         {#each table.fields as field}
